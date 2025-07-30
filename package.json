@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm db:dev\" \"pnpm api:dev\"",
-    "prod": "concurrently \"pnpm db:prod\" \"pnpm api:prod\"",
+    "dev": "concurrently \"pnpm db:dev\" \"pnpm api:dev\" \"pnpm web:dev\"",
+    "dev-with-demo": "concurrently \"pnpm db:dev\" \"pnpm api:dev\" \"pnpm web:dev\" \"pnpm web-demo:dev\"",
+    "prod": "concurrently \"pnpm db:prod\" \"pnpm api:prod\" \"pnpm web:start\" \"pnpm web-demo:start\"",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
@@ -13,6 +14,14 @@
     "api:prod": "pnpm --filter api prod",
     "api:build": "pnpm --filter api build",
     "api:serve": "pnpm --filter api serve",
+    "web:dev": "pnpm --filter web dev",
+    "web:build": "pnpm --filter web build",
+    "web:start": "pnpm --filter web start",
+    "web:lint": "pnpm --filter web lint",
+    "web-demo:dev": "pnpm --filter web-demo dev",
+    "web-demo:build": "pnpm --filter web-demo build",
+    "web-demo:start": "pnpm --filter web-demo start",
+    "web-demo:lint": "pnpm --filter web-demo lint",
     "db:dev": "pnpm --filter db dev",
     "db:prod": "pnpm --filter db prod",
     "db:stop": "pnpm --filter db stop",
@@ -23,5 +32,12 @@
     "turbo": "^2.0.0",
     "concurrently": "^8.2.0"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ]
+  }
 }
