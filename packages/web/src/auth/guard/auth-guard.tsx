@@ -43,6 +43,19 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
+    // Allow access to password setup/reset pages even if authenticated
+    // This is important for password reset flow where user gets temporary session
+    if (pathname === '/auth/set-password' || pathname === '/auth/reset-password') {
+      setIsChecking(false);
+      return;
+    }
+
+    // Allow access to forgot-password page
+    if (pathname === '/auth/forgot-password') {
+      setIsChecking(false);
+      return;
+    }
+
     if (!authenticated) {
       const { method } = CONFIG.auth;
 

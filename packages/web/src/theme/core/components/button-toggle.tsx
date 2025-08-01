@@ -81,6 +81,10 @@ const groupedStateVariants = [
  * 🧩 Components
  * **********************************************************************/
 const MuiToggleButton: Components<Theme>['MuiToggleButton'] = {
+  // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
+  defaultProps: {
+    size: 'small',
+  },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
     root: ({ theme }) => ({

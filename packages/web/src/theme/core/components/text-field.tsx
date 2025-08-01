@@ -143,6 +143,10 @@ const multilineInputVariants = [
 ] satisfies InputBaseVariants;
 
 const MuiInputBase: Components<Theme>['MuiInputBase'] = {
+  // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
+  defaultProps: {
+    size: 'small',
+  },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
     root: ({ theme }) => ({
@@ -228,6 +232,10 @@ export const outlinedInputVariants = {
 };
 
 const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
+  // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
+  defaultProps: {
+    size: 'small',
+  },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
     root: ({ theme }) => ({
@@ -235,7 +243,13 @@ const MuiOutlinedInput: Components<Theme>['MuiOutlinedInput'] = {
       variants: outlinedInputVariants.root,
     }),
     input: { variants: [...outlinedInputVariants.input, ...multilineInputVariants] },
-    notchedOutline: ({ theme }) => outlinedInputStyles.notchedOutline(theme),
+    notchedOutline: ({ theme }) => ({
+      ...outlinedInputStyles.notchedOutline(theme),
+      // Remove the notch since we're using top-positioned labels
+      '& legend': {
+        display: 'none',
+      },
+    }),
   },
 };
 
@@ -309,6 +323,7 @@ export const filledInputVariants = {
 const MuiFilledInput: Components<Theme>['MuiFilledInput'] = {
   // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
   defaultProps: {
+    size: 'small',
     disableUnderline: true,
   },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
@@ -330,6 +345,10 @@ const MuiTextField: Components<Theme>['MuiTextField'] = {
   // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
   defaultProps: {
     variant: 'outlined',
+    size: 'small',
+    InputLabelProps: {
+      shrink: true,
+    },
   },
 };
 

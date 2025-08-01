@@ -11,40 +11,75 @@ const MuiFormControl: Components<Theme>['MuiFormControl'] = {
   // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
   defaultProps: {
     variant: 'outlined',
+    size: 'small',
+  },
+  // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
+  styleOverrides: {
+    root: ({ theme }) => ({
+      // Ensure proper spacing for top-positioned labels
+      '& .MuiInputLabel-root': {
+        position: 'static',
+        transform: 'none',
+        marginBottom: theme.spacing(1.5),
+        fontSize: theme.typography.pxToRem(14),
+        fontWeight: theme.typography.fontWeightMedium,
+        color: theme.vars.palette.text.primary,
+        '&.Mui-focused': {
+          color: theme.vars.palette.text.primary,
+        },
+        '&.Mui-error': {
+          color: theme.vars.palette.error.main,
+        },
+        '&.Mui-disabled': {
+          color: theme.vars.palette.text.disabled,
+        },
+      },
+      // Remove notch for outlined fields since labels are now above
+      '& .MuiOutlinedInput-notchedOutline legend': {
+        display: 'none',
+      },
+    }),
   },
 };
 
 /**
- * Applies label styles to TextField and Select.
+ * Applies label styles to TextField and Select - Standard top-positioned labels.
  */
 const MuiInputLabel: Components<Theme>['MuiInputLabel'] = {
+  // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
+  defaultProps: {
+    shrink: true,
+  },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
     root: ({ theme }) => ({
-      variants: [
-        {
-          props: (props) => !props.shrink,
-          style: {
-            ...getInputTypography(theme, ['fontSize', 'lineHeight']),
-            color: theme.vars.palette.text.disabled,
-          },
-        },
-        {
-          props: (props) => !!props.shrink,
-          style: {
-            fontWeight: theme.typography.fontWeightSemiBold,
-            [`&.${inputLabelClasses.focused}:not(.${inputLabelClasses.error})`]: {
-              color: 'inherit',
-            },
-          },
-        },
-        {
-          props: (props) => !!props.shrink && props.variant === 'filled' && props.size === 'medium',
-          style: {
-            transform: 'translate(12px, 6px) scale(0.75)',
-          },
-        },
-      ],
+      // Always position labels above inputs
+      position: 'static',
+      transform: 'none',
+      marginBottom: theme.spacing(1.5),
+      fontSize: theme.typography.pxToRem(14),
+      fontWeight: theme.typography.fontWeightMedium,
+      color: theme.vars.palette.text.primary,
+      lineHeight: 1.2,
+      
+      // Remove MUI's default floating behavior
+      '&.MuiInputLabel-shrink': {
+        transform: 'none',
+      },
+      
+      // State colors
+      '&.Mui-focused': {
+        color: theme.vars.palette.text.primary,
+      },
+      '&.Mui-error': {
+        color: theme.vars.palette.error.main,
+      },
+      '&.Mui-disabled': {
+        color: theme.vars.palette.text.disabled,
+      },
+      
+      // Remove animations
+      transition: 'none',
     }),
   },
 };

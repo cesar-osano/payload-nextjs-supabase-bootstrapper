@@ -63,20 +63,28 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    'payload-users': PayloadUserAuthOperations;
   };
   blocks: {};
   collections: {
+    'payload-users': PayloadUser;
     users: User;
     media: Media;
+    groups: Group;
+    permissions: Permission;
+    tenants: Tenant;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
+    'payload-users': PayloadUsersSelect<false> | PayloadUsersSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    groups: GroupsSelect<false> | GroupsSelect<true>;
+    permissions: PermissionsSelect<false> | PermissionsSelect<true>;
+    tenants: TenantsSelect<false> | TenantsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -87,15 +95,15 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'users';
+  user: PayloadUser & {
+    collection: 'payload-users';
   };
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
-export interface UserAuthOperations {
+export interface PayloadUserAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -115,10 +123,14 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "payload-users".
  */
-export interface User {
+export interface PayloadUser {
   id: string;
+  /**
+   * Full name of the admin user
+   */
+  name?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -136,6 +148,132 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * 🔄 To resend invites: Use the admin tool at /admin/resend-invites or the "Request New Invite" feature on the login page
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: string;
+  /**
+   * User email address
+   */
+  email: string;
+  /**
+   * Full name of the user
+   */
+  name?: string | null;
+  /**
+   * The tenant/company this user belongs to
+   */
+  tenant: string | Tenant;
+  groups?: (string | Group)[] | null;
+  /**
+   * Supabase user ID for authentication
+   */
+  supabaseId?: string | null;
+  /**
+   * User phone number
+   */
+  phone?: string | null;
+  /**
+   * Timestamp when email was confirmed
+   */
+  emailConfirmedAt?: string | null;
+  /**
+   * Timestamp when phone was confirmed
+   */
+  phoneConfirmedAt?: string | null;
+  /**
+   * Timestamp of last sign in
+   */
+  lastSignInAt?: string | null;
+  /**
+   * Account creation timestamp
+   */
+  createdAt: string;
+  /**
+   * Account last updated timestamp
+   */
+  updatedAt: string;
+  /**
+   * User metadata from Supabase (editable by user)
+   */
+  userMetadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * App metadata from Supabase (read-only for user)
+   */
+  appMetadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Whether the user has confirmed their email and set password
+   */
+  isConfirmed?: boolean | null;
+  /**
+   * Whether this user account is active
+   */
+  isActive?: boolean | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants".
+ */
+export interface Tenant {
+  id: string;
+  /**
+   * Company or organization name
+   */
+  name: string;
+  /**
+   * Company logo image
+   */
+  logo?: (string | null) | Media;
+  /**
+   * Company website URL
+   */
+  website?: string | null;
+  /**
+   * Brief description of the company
+   */
+  description?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country?: string | null;
+  };
+  /**
+   * Primary contact email for the tenant
+   */
+  contactEmail?: string | null;
+  /**
+   * Primary contact phone number
+   */
+  contactPhone?: string | null;
+  /**
+   * Whether this tenant is currently active
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -158,11 +296,45 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "groups".
+ */
+export interface Group {
+  id: string;
+  name: string;
+  description?: string | null;
+  permissions?: (string | Permission)[] | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions".
+ */
+export interface Permission {
+  id: string;
+  name: string;
+  description?: string | null;
+  /**
+   * The resource this permission applies to (e.g., users, orders, products)
+   */
+  resource: string;
+  action: 'create' | 'read' | 'update' | 'delete' | 'manage';
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
   id: string;
   document?:
+    | ({
+        relationTo: 'payload-users';
+        value: string | PayloadUser;
+      } | null)
     | ({
         relationTo: 'users';
         value: string | User;
@@ -170,11 +342,23 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'groups';
+        value: string | Group;
+      } | null)
+    | ({
+        relationTo: 'permissions';
+        value: string | Permission;
+      } | null)
+    | ({
+        relationTo: 'tenants';
+        value: string | Tenant;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
-    value: string | User;
+    relationTo: 'payload-users';
+    value: string | PayloadUser;
   };
   updatedAt: string;
   createdAt: string;
@@ -186,8 +370,8 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: string;
   user: {
-    relationTo: 'users';
-    value: string | User;
+    relationTo: 'payload-users';
+    value: string | PayloadUser;
   };
   key?: string | null;
   value?:
@@ -215,9 +399,10 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "payload-users_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface PayloadUsersSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -237,6 +422,27 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  email?: T;
+  name?: T;
+  tenant?: T;
+  groups?: T;
+  supabaseId?: T;
+  phone?: T;
+  emailConfirmedAt?: T;
+  phoneConfirmedAt?: T;
+  lastSignInAt?: T;
+  createdAt?: T;
+  updatedAt?: T;
+  userMetadata?: T;
+  appMetadata?: T;
+  isConfirmed?: T;
+  isActive?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -252,6 +458,55 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "groups_select".
+ */
+export interface GroupsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  permissions?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions_select".
+ */
+export interface PermissionsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  resource?: T;
+  action?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants_select".
+ */
+export interface TenantsSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  website?: T;
+  description?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        country?: T;
+      };
+  contactEmail?: T;
+  contactPhone?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

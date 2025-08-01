@@ -28,6 +28,10 @@ const colorVariants = [
  * 🧩 Components
  * **********************************************************************/
 const MuiIconButton: Components<Theme>['MuiIconButton'] = {
+  // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
+  defaultProps: {
+    size: 'small',
+  },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
     root: {

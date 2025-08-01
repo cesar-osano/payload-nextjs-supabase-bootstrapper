@@ -32,6 +32,7 @@ const MuiSelect: Components<Theme>['MuiSelect'] = {
   // ▼▼▼▼▼▼▼▼ ⚙️ PROPS ▼▼▼▼▼▼▼▼
   defaultProps: {
     IconComponent: ArrowDownIcon,
+    size: 'small',
   },
   // ▼▼▼▼▼▼▼▼ 🎨 STYLE ▼▼▼▼▼▼▼▼
   styleOverrides: {
